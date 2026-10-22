@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriBot — AI Nutrition Assistant | IBM Granite</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ═══════════════════════════════ -->
+<header class="app-header">
+  <div class="header-inner">
+    <div class="logo-block">
+      <div class="logo-icon">🌿</div>
+      <div>
+        <h1 class="logo-title">NutriBot</h1>
+        <p class="logo-sub">AI Nutrition Assistant · Powered by IBM Granite</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="status-dot" id="statusDot" title="Connected"></div>
+      <button class="btn btn-ghost" id="resetBtn" title="Start new session">↺ New Session</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════ MAIN ════════════════════════════════ -->
+<main class="app-main">
+
+  <!-- LEFT PANEL — Profile Card -->
+  <aside class="side-panel" id="profilePanel">
+    <div class="panel-card">
+      <h2 class="panel-title">👤 Your Profile</h2>
+      <div id="profileContent" class="profile-placeholder">
+        <p>Your nutrition profile will appear here as you chat with NutriBot.</p>
+      </div>
+    </div>
+
+    <div class="panel-card tips-card">
+      <h2 class="panel-title">💡 Healthy Tips</h2>
+      <ul class="tips-list" id="tipsList">
+        <li>Drink 8–10 glasses of water daily.</li>
+        <li>Eat a rainbow of vegetables every day.</li>
+        <li>Prefer whole grains over refined carbs.</li>
+        <li>Limit added sugars and processed foods.</li>
+        <li>Eat mindfully — chew slowly, no screens.</li>
+        <li>Sleep 7–8 hours for metabolic health.</li>
+      </ul>
+    </div>
+
+    <div class="panel-card ethics-card">
+      <h2 class="panel-title">⚖️ AI Ethics</h2>
+      <p class="ethics-text">
+        NutriBot follows <strong>HAM</strong> principles — Helpful, Accurate &amp; Mindful.
+        All advice is for general wellness only. Always consult a qualified
+        healthcare professional for personal medical decisions.
+      </p>
+      <div class="badge-row">
+        <span class="badge">IBM Granite LLM</span>
+        <span class="badge">Guardrails Active</span>
+        <span class="badge">HAM Tone</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER PANEL — Chat -->
+  <section class="chat-section">
+    <!-- Progress stepper -->
+    <div class="stepper" id="stepper">
+      <div class="step active" data-step="name">Name</div>
+      <div class="step-line"></div>
+      <div class="step" data-step="age">Age</div>
+      <div class="step-line"></div>
+      <div class="step" data-step="diet">Diet</div>
+      <div class="step-line"></div>
+      <div class="step" data-step="medical">Health</div>
+      <div class="step-line"></div>
+      <div class="step" data-step="location">Location</div>
+      <div class="step-line"></div>
+      <div class="step" data-step="plan">Plan</div>
+    </div>
+
+    <!-- Chat window -->
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-loading" id="chatLoading">
+        <div class="spinner"></div>
+        <p>Connecting to NutriBot...</p>
+      </div>
+    </div>
+
+    <!-- Quick suggestions -->
+    <div class="quick-suggestions" id="quickSuggestions" style="display:none;">
+      <span class="qs-label">Ask:</span>
+      <button class="qs-btn" data-msg="What foods are good for blood pressure?">Blood pressure foods</button>
+      <button class="qs-btn" data-msg="Give me a healthy breakfast idea">Breakfast ideas</button>
+      <button class="qs-btn" data-msg="How much protein do I need daily?">Daily protein</button>
+      <button class="qs-btn" data-msg="What are anti-inflammatory foods?">Anti-inflammatory</button>
+      <button class="qs-btn" data-msg="Show me my nutrition plan again">My plan</button>
+    </div>
+
+    <!-- Input bar -->
+    <div class="input-bar">
+      <textarea
+        id="userInput"
+        class="chat-input"
+        placeholder="Type your message here..."
+        rows="1"
+        autocomplete="off"
+      ></textarea>
+      <button class="btn btn-send" id="sendBtn" disabled>
+        <span id="sendIcon">➤</span>
+        <span id="sendSpinner" class="btn-spinner" style="display:none;"></span>
+      </button>
+    </div>
+    <p class="input-hint">Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line</p>
+  </section>
+
+</main>
+
+<!-- ═══════════════════════════ PLAN DOWNLOAD MODAL ═══════════════════════════ -->
+<div class="modal-overlay" id="planModal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>🥗 Your 7-Day Nutrition Plan</h2>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="printBtn">🖨️ Print Plan</button>
+      <button class="btn btn-ghost" id="copyBtn">📋 Copy to Clipboard</button>
+      <button class="btn btn-ghost" id="modalClose2">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer class="app-footer">
+  <p>
+    NutriBot is an AI assistant for general wellness information only.
+    It is <strong>not</strong> a substitute for professional medical advice.
+    &nbsp;|&nbsp; Built with <strong>IBM Granite LLM</strong> &nbsp;|&nbsp;
+    <span id="sessionInfo"></span>
+  </p>
+</footer>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
