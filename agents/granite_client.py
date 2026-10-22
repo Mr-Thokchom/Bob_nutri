@@ -1,16 +1,20 @@
 """
 IBM Granite LLM client — wraps the watsonx.ai Chat API.
 Uses ibm/granite-4-h-small via the /ml/v1/text/chat endpoint.
+Credentials are loaded from environment variables (or a .env file).
 """
 
 import os
 import time
 import requests
+from dotenv import load_dotenv
 
-# ─── Configuration ─────────────────────────────────────────────────────────────
+load_dotenv()  # load .env file if present
+
+# ─── Configuration (never hard-code secrets — use .env or env vars) ───────────
 PROJECT_ID   = os.getenv("IBM_PROJECT_ID",   "b6cb73ad-7586-4b7a-b101-b680d376cfdf")
 ENDPOINT_URL = os.getenv("IBM_ENDPOINT_URL", "https://eu-de.ml.cloud.ibm.com")
-API_KEY      = os.getenv("IBM_API_KEY",      "kaCkLh2ce-yo5hxFQgGW4_9xu0V3Mo5bnF5I6ZqF_vB7")
+API_KEY      = os.getenv("IBM_API_KEY", "")   # must be set in .env or environment
 
 IAM_URL      = "https://iam.cloud.ibm.com/identity/token"
 MODEL_ID     = "ibm/granite-4-h-small"          # available & tested on eu-de
@@ -20,6 +24,11 @@ _cached_token: dict = {}
 
 def _get_iam_token() -> str:
     """Fetch (or return cached) IBM Cloud IAM bearer token."""
+    if not API_KEY:
+        raise GraniteAPIError(
+            "IBM_API_KEY is not set. "
+            "Please add it to your .env file: IBM_API_KEY=your-new-api-key"
+        )
     now = time.time()
     if _cached_token.get("token") and now < _cached_token.get("expires_at", 0) - 60:
         return _cached_token["token"]
@@ -44,6 +53,8 @@ def generate_text(prompt: str, max_tokens: int = 1024, temperature: float = 0.7)
     """
     Call the watsonx.ai /text/chat endpoint with IBM Granite and return
     the assistant's reply as a plain string.
+
+    Requires IBM_API_KEY to be set in the environment or .env file.
 
     Raises GraniteAPIError with a human-readable message on any failure.
     """
